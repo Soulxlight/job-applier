@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Job Queue — Job Applier{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Job Queue</h1>
+  <div class="filter-bar">
+    <a href="{{ url_for('jobs', status='pending') }}" class="btn {{ 'btn-primary' if status_filter == 'pending' else 'btn-ghost' }}">Pending</a>
+    <a href="{{ url_for('jobs', status='approved') }}" class="btn {{ 'btn-primary' if status_filter == 'approved' else 'btn-ghost' }}">Approved</a>
+    <a href="{{ url_for('jobs', status='rejected') }}" class="btn {{ 'btn-primary' if status_filter == 'rejected' else 'btn-ghost' }}">Rejected</a>
+    <a href="{{ url_for('jobs', status='applied') }}" class="btn {{ 'btn-primary' if status_filter == 'applied' else 'btn-ghost' }}">Applied</a>
+    <a href="{{ url_for('jobs', status='failed') }}" class="btn {{ 'btn-primary' if status_filter == 'failed' else 'btn-ghost' }}">Failed</a>
+  </div>
+</div>
+
+{% if jobs %}
+<form method="post" action="{{ url_for('bulk_action') }}">
+  <div class="bulk-bar">
+    <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">Approve Selected</button>
+    <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">Reject Selected</button>
+    <label class="select-all-label">
+      <input type="checkbox" id="selectAll"> Select all
+    </label>
+  </div>
+  <div class="job-list">
+    {% for job in jobs %}
+    <div class="job-card">
+      <div class="job-card-check">
+        <input type="checkbox" name="job_ids" value="{{ job.id }}" class="job-check">
+      </div>
+      <div class="job-card-body">
+        <div class="job-card-title">
+          <a href="{{ job.url }}" target="_blank">{{ job.title }}</a>
+          {% if job.easy_apply %}<span class="badge badge-easy">Easy Apply</span>{% endif %}
+          {% if job.remote %}<span class="badge badge-remote">Remote</span>{% endif %}
+        </div>
+        <div class="job-card-meta">
+          <strong>{{ job.company }}</strong>
+          {% if job.location %} · {{ job.location }}{% endif %}
+          {% if job.salary %} · {{ job.salary }}{% endif %}
+          <span class="badge badge-{{ job.platform }}">{{ job.platform }}</span>
+        </div>
+        {% if job.description %}
+        <div class="job-card-desc">{{ job.description[:300] }}{% if job.description|length > 300 %}…{% endif %}</div>
+        {% endif %}
+      </div>
+      <div class="job-card-actions">
+        {% if job.status != 'approved' %}
+        <form method="post" action="{{ url_for('approve_job', job_id=job.id) }}" style="display:inline">
+          <button class="btn btn-success btn-sm">Approve</button>
+        </form>
+        {% endif %}
+        {% if job.status != 'rejected' %}
+        <form method="post" action="{{ url_for('reject_job', job_id=job.id) }}" style="display:inline">
+          <button class="btn btn-danger btn-sm">Reject</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</form>
+{% else %}
+<div class="empty-state">No jobs with status "{{ status_filter }}".</div>
+{% endif %}
+{% endblock %}

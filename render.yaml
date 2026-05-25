@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: job-applier
+    runtime: python
+    buildCommand: |
+      pip install -r requirements.txt
+      playwright install chromium
+      playwright install-deps chromium
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true        # Render auto-generates a secure random value
+      - key: PLAYWRIGHT_HEADLESS
+        value: "true"              # No display server on Render
+      - key: PASSWORD_HASH
+        sync: false                # You paste your hash here in the Render dashboard
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1

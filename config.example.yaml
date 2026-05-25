@@ -1,0 +1,2 @@
+password_hash: "replace-with-generated-password-hash"
+secret_key: "replace-with-random-secret-key"

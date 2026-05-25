@@ -1,0 +1,14 @@
+Dear Hiring Manager,
+
+I am writing to express my strong interest in the {job_title} position at {company}. With {years_experience} years of experience in {field}, I am confident that my background aligns well with what you're looking for.
+
+{custom_paragraph}
+
+I am particularly drawn to {company} because of its reputation and the opportunity to contribute meaningfully to your team. I thrive in collaborative environments and consistently deliver high-quality work.
+
+Thank you for taking the time to review my application. I would welcome the opportunity to discuss how my experience and skills would benefit {company}.
+
+Sincerely,
+{full_name}
+{email}
+{phone}

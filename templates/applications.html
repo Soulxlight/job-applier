@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Applications — Job Applier{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Applications</h1>
+</div>
+
+{% if applications %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>Job</th><th>Company</th><th>Platform</th><th>Status</th><th>Applied</th><th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for app in applications %}
+    <tr>
+      <td><a href="{{ app.job.url }}" target="_blank">{{ app.job.title }}</a></td>
+      <td>{{ app.job.company }}</td>
+      <td><span class="badge badge-{{ app.job.platform }}">{{ app.job.platform }}</span></td>
+      <td>
+        <form method="post" action="{{ url_for('update_app_status', app_id=app.id) }}" class="inline-form">
+          <select name="status" class="status-select" onchange="this.form.submit()">
+            {% for s in ['submitted','confirmed','interviewing','offer','rejected','withdrawn'] %}
+            <option value="{{ s }}" {{ 'selected' if app.status == s }}>{{ s.title() }}</option>
+            {% endfor %}
+          </select>
+        </form>
+      </td>
+      <td>{{ app.submitted_at.strftime('%b %d, %Y') }}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="toggleNotes({{ app.id }})">Notes</button>
+      </td>
+    </tr>
+    <tr id="notes-{{ app.id }}" style="display:none">
+      <td colspan="6">
+        <form method="post" action="{{ url_for('update_app_status', app_id=app.id) }}">
+          <input type="hidden" name="status" value="{{ app.status }}">
+          <textarea name="notes" class="notes-area" placeholder="Interview notes, follow-up dates…">{{ app.notes or '' }}</textarea>
+          <button type="submit" class="btn btn-primary btn-sm">Save Notes</button>
+          <details class="cover-letter-details">
+            <summary>Cover Letter</summary>
+            <pre class="cover-letter-pre">{{ app.cover_letter or '(none)' }}</pre>
+          </details>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty-state">No applications yet. Approve some jobs and click "Apply to Approved" on the dashboard.</div>
+{% endif %}
+{% endblock %}

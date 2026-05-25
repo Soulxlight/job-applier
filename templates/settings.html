@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Settings — Job Applier{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Settings</h1>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="settings-form">
+
+  <section class="settings-section">
+    <h2>Your Profile</h2>
+    <p class="hint">Used to fill application forms and cover letters.</p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" name="first_name" value="{{ app_config.get('profile', {}).get('first_name', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" name="last_name" value="{{ app_config.get('profile', {}).get('last_name', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Full Name (for cover letter)</label>
+        <input type="text" name="full_name" value="{{ app_config.get('profile', {}).get('full_name', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" value="{{ app_config.get('profile', {}).get('email', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" name="phone" value="{{ app_config.get('profile', {}).get('phone', '') }}">
+      </div>
+      <div class="form-group">
+        <label>LinkedIn URL</label>
+        <input type="url" name="linkedin" value="{{ app_config.get('profile', {}).get('linkedin', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Website / Portfolio</label>
+        <input type="url" name="website" value="{{ app_config.get('profile', {}).get('website', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Field / Specialty (e.g. "software engineering")</label>
+        <input type="text" name="field" value="{{ app_config.get('profile', {}).get('field', '') }}">
+      </div>
+      <div class="form-group">
+        <label>Years of Experience</label>
+        <input type="text" name="years_experience" value="{{ app_config.get('profile', {}).get('years_experience', '') }}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Custom Paragraph ({custom_paragraph} in template)</label>
+      <textarea name="custom_paragraph" rows="4">{{ app_config.get('profile', {}).get('custom_paragraph', '') }}</textarea>
+    </div>
+  </section>
+
+  <section class="settings-section">
+    <h2>Resume</h2>
+    {% if app_config.get('resume_path') %}
+    <p class="hint">Current: <code>{{ app_config.resume_path }}</code></p>
+    {% endif %}
+    <input type="file" name="resume" accept=".pdf,.doc,.docx">
+  </section>
+
+  <section class="settings-section">
+    <h2>Cover Letter Template</h2>
+    <p class="hint">Variables: {job_title} {company} {location} {full_name} {email} {phone} {field} {years_experience} {linkedin} {website} {custom_paragraph}</p>
+    <textarea name="cover_template" rows="16" class="code-area">{{ cover_template }}</textarea>
+  </section>
+
+  <section class="settings-section">
+    <h2>Job Search</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Keywords (e.g. "software engineer python")</label>
+        <input type="text" name="keywords" value="{{ search_config.keywords or '' }}">
+      </div>
+      <div class="form-group">
+        <label>Location (leave blank for any)</label>
+        <input type="text" name="location" value="{{ search_config.location or '' }}">
+      </div>
+      <div class="form-group">
+        <label>Max applications per run</label>
+        <input type="number" name="max_applications_per_run" value="{{ search_config.max_applications_per_run or 10 }}" min="1" max="100">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Platforms (comma-separated: linkedin, indeed, ziprecruiter, greenhouse, lever)</label>
+      <input type="text" name="platforms" value="{{ search_config.platforms or '' }}">
+    </div>
+    <div class="form-row">
+      <label class="checkbox-label">
+        <input type="checkbox" name="remote_only" {{ 'checked' if search_config.remote_only }}> Remote only
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" name="auto_approve" {{ 'checked' if search_config.auto_approve }}> Auto-approve all found jobs
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" name="dry_run" {{ 'checked' if app_config.get('dry_run') }}> Dry run (don't actually submit)
+      </label>
+    </div>
+    <div class="form-group">
+      <label>Blacklisted Companies (one per line)</label>
+      <textarea name="blacklisted_companies" rows="4">{{ search_config.blacklisted_companies or '' }}</textarea>
+    </div>
+  </section>
+
+  <section class="settings-section">
+    <h2>Greenhouse Companies</h2>
+    <p class="hint">Enter board tokens, one per line (e.g. <code>stripe</code> → boards.greenhouse.io/stripe)</p>
+    <textarea name="greenhouse_companies" rows="4">{{ '\n'.join(app_config.get('greenhouse_companies', [])) }}</textarea>
+  </section>
+
+  <section class="settings-section">
+    <h2>Lever Companies</h2>
+    <p class="hint">Enter company slugs, one per line (e.g. <code>linear</code> → jobs.lever.co/linear)</p>
+    <textarea name="lever_companies" rows="4">{{ '\n'.join(app_config.get('lever_companies', [])) }}</textarea>
+  </section>
+
+  <section class="settings-section">
+    <h2>Browser Profile</h2>
+    <p class="hint">Path to a persistent Chromium profile. Keeps you logged in to LinkedIn, Indeed, etc.</p>
+    <input type="text" name="browser_profile" value="{{ app_config.get('browser_profile', '/tmp/job_browser') }}">
+  </section>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">Save Settings</button>
+  </div>
+</form>
+{% endblock %}
